@@ -64,6 +64,15 @@ class AppointmentController {
     }
 
     /**
+     * Check if provider_id is equal userId
+     */
+    if (provider_id == req.userId) {
+      return res
+        .status(401)
+        .json({ error: 'Provider cannot be the same logged user' });
+    }
+
+    /**
      * Check for past dates
      */
     const hourStart = startOfHour(parseISO(date));
@@ -92,7 +101,7 @@ class AppointmentController {
     const appointment = await Appointment.create({
       user_id: req.userId,
       provider_id,
-      //date: hourStart,
+      // date: hourStart,
       date,
     });
 
@@ -101,11 +110,9 @@ class AppointmentController {
      */
 
     const user = await User.findByPk(req.userId);
-    const formattedDate = format(
-      hourStart,
-      "dd 'de' MMMM', às' H:mm'h'",
-      { locale: pt}
-    );
+    const formattedDate = format(hourStart, "dd 'de' MMMM', às' H:mm'h'", {
+      locale: pt,
+    });
 
     await Notification.create({
       content: `Novo agendamento de ${user.name} para dia ${formattedDate}`,
